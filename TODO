@@ -28,3 +28,9 @@ class Edge(BaseModel):
     start_id: str = Field(..., description="有向图起点节点 ID")
     end_id: str = Field(..., description="有向图终点节点 ID")
 ```
+
+## 三、 提交合并注意事项 (Data Models)
+
+1. 创建自己的分支提交到远程自己的分支,如git push origin central:central
+2. 合并时统一拉去远程main分支,如git pull origin main
+3. 由甘法博统一提交pr
