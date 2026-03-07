@@ -1,0 +1,36 @@
+# 📅 知识图谱问答系统 - 研发任务分配与接口规范
+
+## 一、 模块开发与集成任务分配
+
+| 负责人 | 核心模块 | 模块描述 | 输入 (Input) | 输出 (Output) |
+| :--- | :--- | :--- | :--- | :--- |
+| **甘法博** | `central_control`<br>`main.py` | **主控路由与系统集成**：负责代码合并、系统级联调以及主程序的入口逻辑编写。 | `user_query`: 用户输入的原始查询 | `system_mode`: 当前系统的运行模式路由指令 |
+| **雷智鹏** | `knowledge_explorer` | **知识挖掘与图谱构建**：基于本地非结构化数据和预定义指令，抽取实体与关系并构建知识图谱。 | `preset_query`: 预设查询指令<br>`local_text_data`: 本地文本数据（如 .txt） | `KnowledgeGraph`: 包含完整 `nodes` 与 `edges` 结构的图谱对象 |
+| **陈昱林** | `graph_retriever` | **图谱语义检索**：在已构建的知识图谱中，基于用户查询进行精准的节点匹配与路径寻路。 | `user_query`: 用户查询<br>`graph_data`: 包含 `nodes` 与 `edges` 的图谱数据 | `retrieved_results`: 命中的目标节点 (Nodes)、节点 ID，或关联路径 (起始点/终止点) |
+| **郑源晔** | `guidance_generator` | **智能建议生成**：结合用户查询与检索到的图谱上下文，生成最终的专业化输出方案。 | `user_query`: 用户查询<br>`retrieved_results`: 检索命中的节点或路径信息 | `professional_guidance`: 结构化、专业化的指导建议 |
+
+---
+
+## 二、 核心数据模型规范 (Data Models)
+
+```python
+from pydantic import BaseModel, Field
+
+class Node(BaseModel):
+    """知识图谱 - 节点实体模型"""
+    id: str = Field(..., description="节点全局唯一标识符 (Node ID)")
+    content: str = Field(..., description="知识点核心内容")
+    phase: str = Field(..., description="知识节点所属的层级、章节或阶段")
+
+class Edge(BaseModel):
+    """知识图谱 - 关系边模型"""
+    id: str = Field(..., description="关系边全局唯一标识符 (Edge ID)")
+    start_id: str = Field(..., description="有向图起点节点 ID")
+    end_id: str = Field(..., description="有向图终点节点 ID")
+```
+
+## 三、 提交合并注意事项 (Data Models)
+
+1. 创建自己的分支提交到远程自己的分支,如git push origin central:central
+2. 合并时统一拉去远程main分支,如git pull origin main
+3. 由甘法博统一提交pr
