@@ -59,6 +59,7 @@ from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
 from state import AgentState
 from modules.knowledgeexplorer.build import build_knowledgeexplorer_graph
+from modules.knowledge_explorer.build import build_knowledge_explorer_graph
 from modules.graphretriever.build import build_graphretriever_graph
 from modules.guidancegenerator.build import build_guidancegenerator_graph
 from modules.central_control.build import build_central_control_graph
@@ -82,8 +83,8 @@ def build_main_graph():
 
     # 添加模块节点
     # 知识拓荒者模块(队员A)：负责联网搜索最新的论文指导资料，并将其提炼为知识点存入图谱
-    knowledgeexplorer_graph = build_knowledgeexplorer_graph()
-    workflow.add_node("knowledgeexplorer", knowledgeexplorer_graph)
+    knowledge_explorer_graph = build_knowledge_explorer_graph()
+    workflow.add_node("knowledge_explorer", knowledge_explorer_graph)
     
     # 图谱领航员模块(队员B)：分析用户问题，去系统现有的知识图谱中匹配最对应的指导节点
     graphretriever_graph = build_graphretriever_graph()
@@ -100,8 +101,8 @@ def build_main_graph():
 
 
     # 添加模块间边
-    workflow.add_edge(START, "knowledgeexplorer")
-    workflow.add_edge("graphretriever", "guidancegenerator")
+    workflow.add_edge(START, "knowledge_explorer")
+    workflow.add_edge("graph_retriever", "guidance_generator")
     workflow.add_conditional_edges(
         "central_control",
         route_central_control,

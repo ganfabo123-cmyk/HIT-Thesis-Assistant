@@ -7,7 +7,7 @@ from state import AgentState
 from .nodes.retrieve_input import retrieve_input
 
 
-def build_knowledgeexplorer_graph():
+def build_knowledge_explorer_graph():
     """构建 knowledgeexplorer 模块的图"""
 
     

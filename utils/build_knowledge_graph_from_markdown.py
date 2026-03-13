@@ -1,33 +1,20 @@
-"""
-knowledgeexplorer 模块 - 工具定义
-"""
-
-from __future__ import annotations
-
-import json
 import re
-from datetime import datetime, timezone
+from typing import List, Dict, Optional
 from pathlib import Path
-from typing import Dict, List, Optional
-
-from langchain_core.tools import tool
-from .models import nodes_generate_model, retrieve_input_response_model, think_retrieve_input_model
-
-
-HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
-ORDERED_RE = re.compile(r"^\s*(\d+)\.\s+(.*)$")
-BULLET_RE = re.compile(r"^\s*[-*+]\s+(.*)$")
-BLOCKQUOTE_RE = re.compile(r"^\s*>\s?(.*)$")
-
+from datetime import datetime, timezone
 
 # 返回项目根目录路径
 def _project_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
 # 默认待解析源文件路径
-def _default_source_path() -> Path:
+def default_source_path() -> Path:
     return _project_root() / "parsed_file" /  "HIT_硕士学位论文中期报告_格式与字体字号要求（来自附件doc）.md"
 
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
+ORDERED_RE = re.compile(r"^\s*(\d+)\.\s+(.*)$")
+BULLET_RE = re.compile(r"^\s*[-*+]\s+(.*)$")
+BLOCKQUOTE_RE = re.compile(r"^\s*>\s?(.*)$")
 
 def _add_node(
     nodes: List[Dict],
@@ -123,40 +110,3 @@ def build_knowledge_graph_from_markdown(markdown: str, source_path: str, queries
     }
 
     return {"metadata": metadata, "nodes": nodes, "edges": edges}
-
-
-@tool(args_schema=nodes_generate_model)
-def nodes_generate(query: str) -> str:
-    """Generate a knowledge graph from the HIT mid-term report format markdown file."""
-    source_path = _default_source_path()
-    markdown = source_path.read_text(encoding="utf-8")
-    graph = build_knowledge_graph_from_markdown(markdown, str(source_path), queries=[query] if query else [])
-    return json.dumps(graph, ensure_ascii=False, indent=2)
-
-
-@tool(args_schema=retrieve_input_response_model)
-def retrieve_input_response(response: str) -> str:
-    """
-     - 响应工具
-
-    Args:
-        响应内容
-
-    Returns:
-        结构化响应字符串
-    """
-    # 响应工具：用于强制 LLM 输出结构化数据
-    return "Response recorded"
-
-
-@tool(args_schema=think_retrieve_input_model)
-def think_retrieve_input_response(result) -> str:
-    """
-    retrieve_input 节点的思考工具 - 用于思维链推理
-    """
-    # TODO: 根据 models.py 中定义的字段，返回结构化的思考结果
-    return str(result)
-
-
-# 工具列表 - 供 LLM 绑定使用
-TOOLS = [nodes_generate, retrieve_input_response, think_retrieve_input_response]
